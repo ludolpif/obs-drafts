@@ -55,6 +55,7 @@ pixel_data vertex_shader_halftone(vertex_data vertex)
     return pixel;
 }
 
+// Note: pow(float3, float) is only defined in HLSL and not in GLSL.
 float3 decode_gamma(float3 color, float exponent, float shift)
 {
     float tmp = exponent - shift;

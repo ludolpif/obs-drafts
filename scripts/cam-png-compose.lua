@@ -15,7 +15,6 @@ function script_description()
   return [[Video effect filter for camera background compositing using color keying and png.
   To configure it, please add a filter "]]..filter_name..[[" on a source, a group or a nested scene.]]
 end
-
 -- Called on script startup
 function script_load(settings)
   local logline = string.format("Registering source %s (%s)", source_info.id, source_info.get_name())
@@ -30,6 +29,20 @@ source_info.type = obs.OBS_SOURCE_TYPE_FILTER   -- INPUT or FILTER or TRANSITION
 source_info.output_flags = obs.OBS_SOURCE_VIDEO -- Combination of VIDEO/AUDIO/ASYNC/etc
 source_info.get_name = function()
   return filter_name -- name displayed in the list of filters
+end
+source_info.get_width = function(data)
+  return data.width
+end
+source_info.get_height = function(data)
+  return data.height
+end
+source_info.destroy = function(data)
+  if data.effect ~= nil then
+    obs.obs_enter_graphics()
+    obs.gs_effect_destroy(data.effect)
+    data.effect = nil
+    obs.obs_leave_graphics()
+  end
 end
 -- Creates the implementation data for the source
 source_info.create = function(settings, source)
@@ -61,23 +74,6 @@ source_info.create = function(settings, source)
   -- Calls update to initialize the rest of the properties-managed settings
   source_info.update(data, settings)
   return data
-end
--- Destroys and release resources linked to the custom data
-source_info.destroy = function(data)
-  if data.effect ~= nil then
-    obs.obs_enter_graphics()
-    obs.gs_effect_destroy(data.effect)
-    data.effect = nil
-    obs.obs_leave_graphics()
-  end
-end
--- Returns the width of the source
-source_info.get_width = function(data)
-  return data.width
-end
--- Returns the height of the source
-source_info.get_height = function(data)
-  return data.height
 end
 -- Called when rendering the source with the graphics subsystem
 source_info.video_render = function(data)
