@@ -64,13 +64,16 @@ source_info.create = function(settings, source)
   obs.blog(obs.LOG_INFO, "Effect compilation success for " .. effect_file_path)
   -- Retrieves the shader uniform variables
   data.params = {}
-  data.params.width = obs.gs_effect_get_param_by_name(data.effect, "width")
-  data.params.height = obs.gs_effect_get_param_by_name(data.effect, "height")
-  data.params.gamma = obs.gs_effect_get_param_by_name(data.effect, "gamma")
-  data.params.gamma_shift = obs.gs_effect_get_param_by_name(data.effect, "gamma_shift")
-  data.params.amplitude = obs.gs_effect_get_param_by_name(data.effect, "amplitude")
-  data.params.scale = obs.gs_effect_get_param_by_name(data.effect, "scale")
-  data.params.number_of_color_levels = obs.gs_effect_get_param_by_name(data.effect, "number_of_color_levels")
+  -- data.params.width = obs.gs_effect_get_param_by_name(data.effect, "width")
+  -- data.params.height = obs.gs_effect_get_param_by_name(data.effect, "height")
+  data.params.mode = obs.gs_effect_get_param_by_name(data.effect, "mode")
+  data.params.bg_key_color = obs.gs_effect_get_param_by_name(data.effect, "bg_key_color")
+  data.params.bg_saturation = obs.gs_effect_get_param_by_name(data.effect, "bg_saturation")
+  data.params.bg_blur = obs.gs_effect_get_param_by_name(data.effect, "bg_blur")
+  data.params.bg_mul_enable = obs.gs_effect_get_param_by_name(data.effect, "bg_mul_enable")
+  data.params.bg_mul_color = obs.gs_effect_get_param_by_name(data.effect, "bg_mul_color")
+  data.params.similarity = obs.gs_effect_get_param_by_name(data.effect, "similarity")
+  data.params.smoothness = obs.gs_effect_get_param_by_name(data.effect, "smoothness")
   -- Calls update to initialize the rest of the properties-managed settings
   source_info.update(data, settings)
   return data
@@ -84,100 +87,80 @@ source_info.video_render = function(data)
   obs.obs_source_process_filter_begin(data.source, obs.GS_RGBA, obs.OBS_NO_DIRECT_RENDERING)
 
   -- Effect parameters initialization goes here
-  obs.gs_effect_set_int(data.params.width, data.width)
-  obs.gs_effect_set_int(data.params.height, data.height)
-  obs.gs_effect_set_float(data.params.gamma, data.gamma)
-  obs.gs_effect_set_float(data.params.gamma_shift, data.gamma_shift)
-  obs.gs_effect_set_float(data.params.amplitude, data.amplitude)
-  obs.gs_effect_set_float(data.params.scale, data.scale)
-  obs.gs_effect_set_int(data.params.number_of_color_levels, data.number_of_color_levels)
+  -- obs.gs_effect_set_int(data.params.width, data.width)
+  -- obs.gs_effect_set_int(data.params.height, data.height)
+  obs.gs_effect_set_int(data.params.mode, data.mode)
+  obs.gs_effect_set_color(data.params.bg_key_color, data.bg_key_color)
+  obs.gs_effect_set_float(data.params.bg_saturation, data.bg_saturation)
+  obs.gs_effect_set_float(data.params.bg_blur, data.bg_blur)
+  obs.gs_effect_set_bool(data.params.bg_mul_enable, data.bg_mul_enable)
+  obs.gs_effect_set_color(data.params.bg_mul_color, data.bg_mul_color)
+  obs.gs_effect_set_float(data.params.similarity, data.similarity)
+  obs.gs_effect_set_float(data.params.smoothness, data.smoothness)
 
   obs.obs_source_process_filter_end(data.source, data.effect, data.width, data.height)
 end
--- Create UI items in the filter config pane
-source_info.get_properties = function(data)
-  local props = obs.obs_properties_create()
-  obs.obs_properties_add_float_slider(props, "gamma", "Gamma encoding exponent", 1.0, 2.2, 0.2)
-  obs.obs_properties_add_float_slider(props, "gamma_shift", "Gamma shift", -2.0, 2.0, 0.01)
-  obs.obs_properties_add_float_slider(props, "scale", "Pattern scale", 0.01, 10.0, 0.01)
-  obs.obs_properties_add_float_slider(props, "amplitude", "Perturbation amplitude", 0.0, 2.0, 0.01)
-  obs.obs_properties_add_int_slider(props, "number_of_color_levels", "Number of color levels", 2, 10, 1)
-  return props
-end
--- Give to OBS default settings for this source
+-- Give to OBS default settings for this source (UI "Reset to defaults" button)
 source_info.get_defaults = function(settings)
-  obs.obs_data_set_default_double(settings, "gamma", 1.0)
-  obs.obs_data_set_default_double(settings, "gamma_shift", 0.0)
-  obs.obs_data_set_default_double(settings, "scale", 1.0)
-  obs.obs_data_set_default_double(settings, "amplitude", 0.2)
-  obs.obs_data_set_default_int(settings, "number_of_color_levels", 4)
+  obs.blog(obs.LOG_INFO, "source_info.get_defaults called")
+  obs.obs_data_set_default_int(settings, "mode", 1)
+  obs.obs_data_set_default_int(settings, "bg_key_color", 0x00ff00)
+  obs.obs_data_set_default_double(settings, "bg_saturation", 1.0)
+  obs.obs_data_set_default_double(settings, "bg_blur", 1.0)
+  obs.obs_data_set_default_bool(settings, "bg_mul_enable", false)
+  obs.obs_data_set_default_int(settings, "bg_mul_color", 0x2b2a32)
+  obs.obs_data_set_default_int(settings, "similarity", 80)
+  obs.obs_data_set_default_int(settings, "smoothness", 50)
 end
 -- Updates the internal data for this source upon settings change
 source_info.update = function(data, settings)
-  data.gamma = obs.obs_data_get_double(settings, "gamma")
-  data.gamma_shift = obs.obs_data_get_double(settings, "gamma_shift")
-  data.scale = obs.obs_data_get_double(settings, "scale")
-  data.amplitude = obs.obs_data_get_double(settings, "amplitude")
-  data.number_of_color_levels = obs.obs_data_get_int(settings, "number_of_color_levels")
+  obs.blog(obs.LOG_INFO, "source_info.update called")
+  data.mode = obs.obs_data_get_int(settings, "mode")
+  data.bg_key_color = obs.obs_data_get_int(settings, "bg_key_color")
+  data.bg_saturation = obs.obs_data_get_double(settings, "bg_saturation")
+  data.bg_blur = obs.obs_data_get_double(settings, "bg_blur")
+  data.bg_mul_enable = obs.obs_data_get_bool(settings, "bg_mul_enable")
+  data.bg_mul_color = obs.obs_data_get_int(settings, "bg_mul_color")
+  data.similarity = obs.obs_data_get_int(settings, "similarity") / 1000.0
+  data.smoothness = obs.obs_data_get_int(settings, "smoothness") / 1000.0
+end
+-- Create UI items in the filter config pane
+source_info.get_properties = function(data)
+  obs.blog(obs.LOG_INFO, "source_info.get_properties called")
+  local props = obs.obs_properties_create()
+  -- Mode selector
+  MY_OPTIONS = {"Re-use cam background", "Remove cam background"}
+  local plist = obs.obs_properties_add_list(props, "mode", "Mode", obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_INT)
+  obs.obs_property_list_add_int(plist, "Re-use cam background", 1)
+  obs.obs_property_list_add_int(plist, "Remove cam background", 2)
+  obs.obs_property_set_modified_callback(plist, on_filter_ui_conditions_changed)
+  -- Other controls
+  obs.obs_properties_add_color(props, "bg_key_color", "Background key color")
+  obs.obs_properties_add_float_slider(props, "bg_saturation", "Background saturation", 0.0, 1.0, 0.01)
+  obs.obs_properties_add_float_slider(props, "bg_blur", "Background blur strengh", 0.0, 8.0, 0.01)
+  local pbg_mul_enable = obs.obs_properties_add_bool(props, "bg_mul_enable", "Enable background color multiplier")
+  obs.obs_property_set_modified_callback(pbg_mul_enable, on_filter_ui_conditions_changed)
+  obs.obs_properties_add_color(props, "bg_mul_color", "Background color")
+  obs.obs_properties_add_int_slider(props, "similarity", "Key color similarity", 0, 1000, 1)
+  obs.obs_properties_add_int_slider(props, "smoothness", "Bg removal smoothness", 0, 1000, 1)
+  data.props = props
+  return props
+end
+-- Callback on list or booleans modification
+function on_filter_ui_conditions_changed(props, property, settings)
+  local mode = obs.obs_data_get_int(settings, "mode")
+  local bg_mul_enable = obs.obs_data_get_bool(settings, "bg_mul_enable")
+  -- Disable UI items depending on mode and booleans, FIXME it is not refreshed by "Set defaults values" button is pressed
+  obs.obs_property_set_enabled(obs.obs_properties_get(props, "bg_saturation"), mode==1)
+  obs.obs_property_set_enabled(obs.obs_properties_get(props, "bg_blur"), mode==1)
+  obs.obs_property_set_enabled(obs.obs_properties_get(props, "bg_mul_enable"), mode==1)
+  obs.obs_property_set_enabled(obs.obs_properties_get(props, "bg_mul_color"), mode==1 and bg_mul_enable)
+  return true -- IMPORTANT: returns true to trigger refresh of the properties
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- Debug tools
+-- Debug "tools"
 function log_globals()
   for key, value in pairs(_G) do
     print("Global " .. type(value) .. ": " .. key .. " = " .. tostring(value))
   end
-end
-
-
--- UI items to let the user choose settings
-function disabled_script_properties()
-  local properties = obs.obs_properties_create()
-
-  -- Combo list filled with the options from MY_OPTIONS
-  local plist = obs.obs_properties_add_list(properties, "mode", "Mode",
-              obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_INT)
-  MY_OPTIONS = {"Mode 1", "Mode 2"}
-  for i,v in ipairs(MY_OPTIONS) do
-    obs.obs_property_list_add_int(plist, v, i)
-  end
-  -- Sets callback upon modification of the list
-  obs.obs_property_set_modified_callback(plist, ui_mode_changed_callback)
-
-  obs.obs_properties_add_int(properties, "mynumber", "My number in Mode 1", 1, 10, 1)
-  obs.obs_properties_add_color(properties, "mycolor", "My color in Mode 2")
-
-  -- Calls the callback once to set-up current visibility
-  obs.obs_properties_apply_settings(properties, my_settings)
-  
-  return properties
-end
--- Callback on UI list modification
-function ui_mode_changed_callback(props, property, settings)
-  -- counter = counter + 1
-  -- obs.script_log(obs.LOG_INFO, string.format("hello %d", counter))
-  local mode = obs.obs_data_get_int(settings, "mode")
-  obs.obs_property_set_visible(obs.obs_properties_get(props, "mynumber"), mode==1)
-  obs.obs_property_set_visible(obs.obs_properties_get(props, "mycolor"), mode==2)
-  return true  -- IMPORTANT: returns true to trigger refresh of the properties
 end
