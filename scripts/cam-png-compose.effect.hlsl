@@ -12,8 +12,8 @@ uniform Texture2D image;   // Texture containing the source picture (from camera
 
 // Extra uniform variables set by cam-png-compose OBS plugin
 uniform Texture2D image2;  // Texture containing the picture to mix in (from png)
-uniform bool draw_config_visuals_enable = true;
 uniform int mode = 1;
+uniform bool draw_config_visuals_enable = true;
 uniform int bg_key_color = 0;
 uniform float bg_saturation = 1.0;
 uniform float bg_blur = 1.0;
