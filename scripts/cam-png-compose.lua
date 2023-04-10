@@ -72,6 +72,7 @@ source_info.video_get_color_space = function(filter)
   -- }
 end
 source_info.destroy = function(filter)
+  obs.script_log(obs.LOG_DEBUG, "source_info.destroy called")
   if filter.effect ~= nil then
     obs.obs_enter_graphics()
     obs.gs_effect_destroy(filter.effect)

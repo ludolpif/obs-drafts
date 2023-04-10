@@ -61,7 +61,9 @@ SamplerState textureSampler {
     Filter    = Linear; // Anisotropy / Point / Linear
     AddressU  = Clamp;  // Wrap / Clamp / Mirror / Border / MirrorOnce
     AddressV  = Clamp;  // Wrap / Clamp / Mirror / Border / MirrorOnce
-    BorderColor = 00000000; // Used only with Border edges (optional)
+    // AddressW = Clamp; // For 3D textures
+    // MaxAnisotropy = 1; // 1 is default value
+    // BorderColor = 00000000; // Used only with Border edges (optional)
 };
 
 // Pixel shader used to ...
@@ -86,7 +88,7 @@ float4 PSColorKeyRGBA(VertDataOut v_in) : TARGET {
 0.080, 0.050, 0.100, 0.900,
 0.080, 0.050, 0.900, 0.900
 );
-    float2 k1_uv = key_colors_config[2].pq;
+    float2 k1_uv = key_colors_config[1].pq;
     float4 k1_s = image.Sample(textureSampler, k1_uv);
     float3 k1_nl = GetNonlinearColor(k1_s.rgb);
 
