@@ -13,7 +13,7 @@ uniform Texture2D image;   // Texture containing the source picture (from camera
 // Extra uniform variables set by cam-png-compose OBS plugin
 uniform Texture2D image2;  // Texture containing the picture to mix in (from png)
 uniform int mode = 1;
-uniform bool draw_config_visuals_enable = true;
+uniform bool draw_config = false;
 uniform int bg_key_color = 0;
 uniform float bg_saturation = 1.0;
 uniform float bg_blur = 1.0;
@@ -92,7 +92,7 @@ float4 PSColorKeyRGBA(VertDataOut v_in) : TARGET {
     float4 k1_s = image.Sample(textureSampler, k1_uv);
     float3 k1_nl = GetNonlinearColor(k1_s.rgb);
 
-    if ( draw_config_visuals_enable ) {
+    if ( draw_config ) {
         float4 cv = PSDrawConfigVisuals(v_in, k1_uv, k1_s);
         if ( cv.a > 0.0 ) return cv;
     }
