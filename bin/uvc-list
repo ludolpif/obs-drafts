@@ -1,0 +1,24 @@
+#!/bin/bash
+# apt install v4l-utils
+
+# Output example
+# /dev/video0:usb:0c45:6366:Microdia Webcam Vitade AF:MJPG YUYV
+# /dev/video2:usb:0c45:6366:Microdia Webcam Vitade AF:H264
+# /dev/video4:usb:1532:0e05:Razer USA, Ltd Razer Kiyo Pro:YUYV MJPG H264 NV12
+
+shopt -s nullglob
+for dev in /dev/video*
+do
+	props=$(udevadm info --no-pager --query=property --name="$dev"\
+		| grep -E '^(MINOR|ID_BUS|ID_MODEL_ID|ID_VENDOR_ID|ID_V4L_CAPABILITIES)=[:A-Za-z0-9]+$')
+	eval "$props"
+	if echo $ID_V4L_CAPABILITIES | grep -q ":capture:"
+	then
+		DETAILS=""
+		if [[ "$ID_BUS"="usb" ]]
+		then DETAILS=$(lsusb -d $ID_VENDOR_ID:$ID_MODEL_ID | sed -ne 's/^.*ID ....:.... //p' | tr : _)
+		fi
+		FORMATS=$(v4l2-ctl -d $dev --list-formats | sed -ne "s/^.*'\([^']\+\)'.*$/\1/p")
+		echo $dev:$ID_BUS:$ID_VENDOR_ID:$ID_MODEL_ID:$DETAILS:$FORMATS
+	fi
+done
