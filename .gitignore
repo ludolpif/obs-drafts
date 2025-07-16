@@ -3,3 +3,7 @@ __pycache__/
 *.py[cod]
 # File with sensitive keys
 service.json
+# Binary blobs
+/pkg
+# GIMP files
+*.xcf
