@@ -1,0 +1,14 @@
+<!DOCTYPE patchbay>
+<patchbay name="streaming-v1" version="0.8.2">
+ <items>
+  <item node-type="pipewire" port-type="pipewire-midi">
+   <output node="Midi-Bridge" port="Launchkey Mini:Launchkey Mini LK Mini MIDI"/>
+   <input node="Midi-Bridge" port="SparkFun Pro Micro:SparkFun Pro Micro MIDI 1"/>
+  </item>
+  <item node-type="pipewire" port-type="pipewire-audio">
+   <output node="EDIROL UA-25EX (Advanced mode) Stéréo analogique" port="UA-25EX:capture_FR"/>
+   <input node="Porte" port="gate:input_FL"/>
+  </item>
+ </items>
+</patchbay>
+
