@@ -7,3 +7,5 @@ service.json
 /pkg
 # GIMP files
 *.xcf
+# Varying files for each stream
+/txt/titre-court.txt
