@@ -7,7 +7,7 @@
   </item>
   <item node-type="pipewire" port-type="pipewire-audio">
    <output node="EDIROL UA-25EX (Advanced mode) Stéréo analogique" port="UA-25EX:capture_FR"/>
-   <input node="Porte" port="gate:input_FL"/>
+   <input node="Compresseur" port="compressor:input_FL"/>
   </item>
  </items>
 </patchbay>

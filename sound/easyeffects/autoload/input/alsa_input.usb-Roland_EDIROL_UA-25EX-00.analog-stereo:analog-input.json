@@ -1,0 +1,6 @@
+{
+    "device": "alsa_input.usb-Roland_EDIROL_UA-25EX-00.analog-stereo",
+    "device-description": "EDIROL UA-25EX (Advanced mode) Stéréo analogique",
+    "device-profile": "analog-input",
+    "preset-name": "streaming-v2"
+}
